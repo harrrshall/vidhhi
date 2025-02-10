@@ -42,13 +42,11 @@ const EnhancedGallery: React.FC = () => {
     setCurrentIndex(index);
   };
 
-  // Wrapped with useCallback to keep the identity stable.
   const closeLightbox = useCallback((): void => {
     setSelectedItem(null);
     setIsFullscreen(false);
   }, []);
 
-  // Wrapped with useCallback to prevent identity changes across renders.
   const navigateGallery = useCallback(
     (direction: number): void => {
       const newIndex = (currentIndex + direction + mediaItems.length) % mediaItems.length;
@@ -58,7 +56,6 @@ const EnhancedGallery: React.FC = () => {
     [currentIndex]
   );
 
-  // Wrapped with useCallback as it's used in the keydown event handler.
   const toggleFullscreen = useCallback((): void => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
@@ -69,11 +66,9 @@ const EnhancedGallery: React.FC = () => {
     }
   }, []);
 
-  // The effect now includes navigateGallery, closeLightbox, and toggleFullscreen in its dependency array.
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (!selectedItem) return;
-
       switch (e.key) {
         case 'ArrowLeft':
           navigateGallery(-1);
@@ -97,46 +92,50 @@ const EnhancedGallery: React.FC = () => {
   }, [selectedItem, navigateGallery, closeLightbox, toggleFullscreen]);
 
   return (
-    <section className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-16 px-4">
+    <section className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-10 px-4">
+      {/* Header */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-center mb-12"
+        transition={{ duration: 1 }}
+        className="text-center mb-8 px-4"
       >
-        <h2 className="text-4xl md:text-5xl font-bold text-pink-600 mb-4">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-pink-600 tracking-wide mb-2">
           Our Precious Moments
         </h2>
-        <p className="text-gray-600 text-lg">Capturing our journey together ❤️</p>
+        <p className="text-gray-500 text-sm sm:text-base">
+          Capturing our journey together <span className="text-pink-600">❤️</span>
+        </p>
       </motion.div>
 
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Gallery Grid */}
+      <div className="max-w-5xl mx-auto px-2">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {mediaItems.map((item, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.1, type: 'spring', stiffness: 100 }}
               className="relative group"
               onMouseEnter={() => setIsHovered(index)}
               onMouseLeave={() => setIsHovered(null)}
             >
-              <div className="relative aspect-square overflow-hidden rounded-xl shadow-lg">
+              <div className="relative aspect-square overflow-hidden rounded-2xl shadow-2xl">
                 <Image
                   src={item.thumbnail}
                   alt={`Memory ${index + 1}`}
                   fill
-                  className="object-cover transform transition-transform duration-500 group-hover:scale-110"
+                  className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
                 />
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: isHovered === index ? 1 : 0 }}
-                  className="absolute inset-0 bg-black bg-opacity-40 transition-opacity flex items-center justify-center"
+                  className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center transition-opacity"
                 >
                   <button
                     onClick={() => openLightbox(index)}
-                    className="bg-white bg-opacity-90 p-4 rounded-full transform transition-transform hover:scale-110"
+                    className="bg-white p-3 rounded-full shadow-md hover:scale-110 transition-transform"
                   >
                     {item.type === 'video' ? (
                       <Play className="w-6 h-6 text-pink-600" />
@@ -151,22 +150,23 @@ const EnhancedGallery: React.FC = () => {
         </div>
       </div>
 
+      {/* Lightbox */}
       <AnimatePresence>
         {selectedItem && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
           >
-            {/* Back button and controls overlay */}
-            <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center bg-gradient-to-b from-black/70 to-transparent z-50">
+            {/* Top Controls */}
+            <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center backdrop-blur-md">
               <button
                 onClick={closeLightbox}
                 className="flex items-center text-white hover:text-pink-400 transition-colors"
               >
                 <ArrowLeft className="w-6 h-6 mr-2" />
-                <span>Back to Gallery</span>
+                <span className="text-sm sm:text-base">Back to Gallery</span>
               </button>
               <div className="flex gap-4">
                 <button
@@ -188,25 +188,25 @@ const EnhancedGallery: React.FC = () => {
               </div>
             </div>
 
-            {/* Navigation buttons */}
+            {/* Navigation Buttons */}
             <button
               onClick={() => navigateGallery(-1)}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-2 rounded-full hover:bg-white/20 transition-colors z-50"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-colors"
             >
               <ChevronLeft className="w-8 h-8" />
             </button>
 
             <button
               onClick={() => navigateGallery(1)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-2 rounded-full hover:bg-white/20 transition-colors z-50"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-colors"
             >
               <ChevronRight className="w-8 h-8" />
             </button>
 
-            {/* Media content */}
+            {/* Media Display */}
             <div
-              className={`max-w-7xl max-h-screen p-4 relative ${
-                isFullscreen ? 'w-screen h-screen' : ''
+              className={`max-w-full max-h-full p-2 relative ${
+                isFullscreen ? 'w-screen h-screen' : 'w-full h-auto'
               }`}
             >
               {selectedItem.type === 'video' ? (
