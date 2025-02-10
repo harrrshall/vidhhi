@@ -59,19 +59,19 @@ export default function StoryCards() {
 
   const slideVariants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
+      y: direction > 0 ? 1000 : -1000,
       opacity: 0,
       scale: 0.5
     }),
     center: {
       zIndex: 1,
-      x: 0,
+      y: 0,
       opacity: 1,
       scale: 1
     },
     exit: (direction: number) => ({
       zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
+      y: direction < 0 ? 1000 : -1000,
       opacity: 0,
       scale: 0.5
     })
@@ -107,7 +107,7 @@ export default function StoryCards() {
         <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
           Our Love Story
         </h1>
-        <p className="text-gray-600 mt-2">Swipe to explore our journey</p>
+        <p className="text-gray-600 mt-2">Swipe up or down to explore our journey</p>
       </motion.div>
 
       {/* Card Section */}
@@ -122,14 +122,14 @@ export default function StoryCards() {
               animate="center"
               exit="exit"
               transition={{
-                x: { type: "spring", stiffness: 300, damping: 30 },
+                y: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: 0.2 }
               }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={1}
               onDragEnd={(e, { offset, velocity }) => {
-                const swipe = swipePower(offset.x, velocity.x);
+                const swipe = swipePower(offset.y, velocity.y);
                 if (swipe < -swipeConfidenceThreshold) {
                   paginate(1);
                 } else if (swipe > swipeConfidenceThreshold) {
@@ -160,8 +160,8 @@ export default function StoryCards() {
                   </p>
                 </div>
 
-                {/* Progress Dots */}
-                <div className="flex gap-2 mt-6">
+                {/* Progress Indicators - Now Vertical */}
+                <div className="fixed right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-2">
                   {events.map((_, index) => (
                     <motion.div
                       key={index}
@@ -187,22 +187,21 @@ export default function StoryCards() {
         </div>
       </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-center gap-4 p-6">
-        <button
-          onClick={() => paginate(-1)}
-          className="px-6 py-3 rounded-full bg-white shadow-md text-pink-600 font-semibold
-            hover:shadow-lg transition-shadow"
+      {/* Navigation Hints */}
+      <div className="text-center p-6 text-gray-500">
+        <motion.div
+          animate={{ y: [0, 5, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="mb-2"
         >
-          Previous
-        </button>
-        <button
-          onClick={() => paginate(1)}
-          className="px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500
-            text-white font-semibold shadow-md hover:shadow-lg transition-shadow"
+          ↑ Swipe Up for Next
+        </motion.div>
+        <motion.div
+          animate={{ y: [0, -5, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
         >
-          Next
-        </button>
+          ↓ Swipe Down for Previous
+        </motion.div>
       </div>
     </div>
   );
