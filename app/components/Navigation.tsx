@@ -8,17 +8,19 @@ interface NavigationProps {
 
 export default function Navigation({ currentIndex, setIndex, titles }: NavigationProps) {
   return (
-    <nav className="fixed bottom-4 left-0 right-0 flex justify-center z-50">
-      <div className="bg-white bg-opacity-80 rounded-full px-4 py-2 flex space-x-2">
+    <nav className="fixed bottom-4 left-0 right-0 flex flex-col items-center z-50 px-4">
+      <div className="bg-white/90 rounded-2xl px-4 py-3 flex flex-wrap gap-2 shadow-sm max-w-md mx-auto">
         {titles.map((title, index) => (
           <motion.button
             key={index}
-            className={`text-sm px-3 py-1 rounded-full ${
-              currentIndex === index ? "bg-pink-500 text-white" : "text-pink-500"
+            className={`text-sm px-4 py-1.5 rounded-full transition-colors ${
+              currentIndex === index 
+                ? "bg-pink-400 text-white" 
+                : "hover:bg-pink-50 text-pink-400"
             }`}
             onClick={() => setIndex(index)}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             {title}
           </motion.button>
@@ -27,4 +29,3 @@ export default function Navigation({ currentIndex, setIndex, titles }: Navigatio
     </nav>
   )
 }
-
